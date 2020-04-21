@@ -4,7 +4,9 @@ import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.swingfrog.summer.util.ForwardedAddressUtil;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.AttributeKey;
 
 public class SessionContextGroup {
 
@@ -21,7 +23,10 @@ public class SessionContextGroup {
 		InetSocketAddress address = (InetSocketAddress)ctx.channel().remoteAddress();
 		SessionContext sctx = new SessionContext();
 		sctx.setSessionId(id);
-		sctx.setAddress(address.getHostString());
+		sctx.setDirectAddress(address.getHostString());
+		Object forwardedAddressList = ctx.channel().attr(AttributeKey.valueOf(ForwardedAddressUtil.KEY)).get();
+		if (forwardedAddressList != null)
+			sctx.setRealAddress(ForwardedAddressUtil.parse(forwardedAddressList.toString()));
 		sctx.setPort(address.getPort());
 		sctx.setCurrentMsgId(0);
 		sctx.setHeartCount(0);

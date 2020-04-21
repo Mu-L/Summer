@@ -22,7 +22,7 @@ public class WebRequest extends SessionRequest {
 		WebRequest webRequest = new WebRequest();
 		webRequest.setHttpRequest(httpRequest);
 		JSONObject data = new JSONObject();
-		if (uri.indexOf("?") > -1) {
+		if (uri.contains("?")) {
 			String[] strs = uri.split("\\?");
 			if (strs.length == 2) {
 				uri = strs[0];
@@ -31,7 +31,7 @@ public class WebRequest extends SessionRequest {
 					String[] value = query.split("&");
 					for (int i = 0; i < value.length; i++) {
 						String keyValue = value[i];
-						if (keyValue.indexOf("=") > -1) {
+						if (keyValue.contains("=")) {
 							String[] keyAndValue = keyValue.split("=");
 							if (keyAndValue.length == 2)
 								data.put(keyAndValue[0], keyAndValue[1]);
@@ -41,13 +41,13 @@ public class WebRequest extends SessionRequest {
 			}
 		}
 		webRequest.setPath(uri);
-		if (uri.indexOf(".") > -1) {
+		if (uri.contains(".")) {
 			webRequest.setDynamic(false);
 		} else {
 			webRequest.setDynamic(true);
 			String[] remoteMethod = uri.split("_");
 			if (remoteMethod.length == 2) {
-				webRequest.setRemote(remoteMethod[0].substring(1, remoteMethod[0].length()));
+				webRequest.setRemote(remoteMethod[0].substring(1));
 				webRequest.setMethod(remoteMethod[1]);
 			} else {
 				webRequest.setDynamic(false);

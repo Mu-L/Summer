@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 
 import com.swingfrog.summer.server.async.ProcessResult;
 import com.swingfrog.summer.statistics.RemoteStatistics;
+import com.swingfrog.summer.util.ForwardedAddressUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,6 +135,7 @@ public class WebRequestHandler extends SimpleChannelInboundHandler<HttpObject> {
 					return;
 				}
 				sctx.setSessionId(parseSessionId(httpRequest.headers().get(HttpHeaderNames.COOKIE)));
+				sctx.setRealAddress(ForwardedAddressUtil.parse(httpRequest.headers().get(ForwardedAddressUtil.KEY)));
 				HttpMethod method = httpRequest.method();
 				if (HttpMethod.GET.equals(method)) {
 					doGet(ctx, sctx);

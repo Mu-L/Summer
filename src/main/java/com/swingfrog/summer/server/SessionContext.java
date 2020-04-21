@@ -10,7 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SessionContext {
 
 	private String sessionId;
-	private String address;
+	private String directAddress;
+	private String realAddress;
 	private int port;
 	
 	private long currentMsgId;
@@ -27,11 +28,20 @@ public class SessionContext {
 	public void clearSessionId() {
 		sessionId = null;
 	}
-	public String getAddress() {
-		return address;
+	public String getDirectAddress() {
+		return directAddress;
 	}
-	public void setAddress(String address) {
-		this.address = address;
+	public void setDirectAddress(String directAddress) {
+		this.directAddress = directAddress;
+	}
+	public String getRealAddress() {
+		return realAddress;
+	}
+	public void setRealAddress(String realAddress) {
+		this.realAddress = realAddress;
+	}
+	public String getAddress() {
+		return realAddress != null ? realAddress : directAddress;
 	}
 	public int getPort() {
 		return port;
@@ -68,7 +78,7 @@ public class SessionContext {
 	}
 	@Override
 	public String toString() {
-		return String.format("IP[%s:%s]", address, port);
+		return String.format("IP[%s:%s]", getAddress(), port);
 	}
 	public void send(SessionRequest request, Object data) {
 		AsyncResponseMgr.get().sendResponse(this, request, data);
