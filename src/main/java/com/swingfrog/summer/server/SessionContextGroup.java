@@ -4,13 +4,12 @@ import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.swingfrog.summer.util.ForwardedAddressUtil;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.AttributeKey;
+import io.netty.channel.ChannelId;
 
 public class SessionContextGroup {
 
-	private ConcurrentHashMap<ChannelHandlerContext, SessionContext> channelToSessionMap;
+	private ConcurrentHashMap<ChannelId, SessionContext> channelToSessionMap;
 	private ConcurrentHashMap<SessionContext, ChannelHandlerContext> sessionToChannelMap;
 	
 	public SessionContextGroup() {
@@ -24,23 +23,20 @@ public class SessionContextGroup {
 		SessionContext sctx = new SessionContext();
 		sctx.setSessionId(id);
 		sctx.setDirectAddress(address.getHostString());
-		Object forwardedAddressList = ctx.channel().attr(AttributeKey.valueOf(ForwardedAddressUtil.KEY)).get();
-		if (forwardedAddressList != null)
-			sctx.setRealAddress(ForwardedAddressUtil.parse(forwardedAddressList.toString()));
 		sctx.setPort(address.getPort());
 		sctx.setCurrentMsgId(0);
 		sctx.setHeartCount(0);
 		sctx.setLastRecvTime(0);
-		channelToSessionMap.put(ctx, sctx);
+		channelToSessionMap.put(ctx.channel().id(), sctx);
 		sessionToChannelMap.put(sctx, ctx);
 	}
 	
 	public void destroySession(ChannelHandlerContext ctx) {
-		sessionToChannelMap.remove(channelToSessionMap.remove(ctx));
+		sessionToChannelMap.remove(channelToSessionMap.remove(ctx.channel().id()));
 	}
 	
 	public SessionContext getSessionByChannel(ChannelHandlerContext ctx) {
-		return channelToSessionMap.get(ctx);
+		return channelToSessionMap.get(ctx.channel().id());
 	}
 	
 	public ChannelHandlerContext getChannelBySession(SessionContext sctx) {
@@ -52,7 +48,7 @@ public class SessionContextGroup {
 	}
 	
 	public Iterator<ChannelHandlerContext> iteratorChannel() {
-		return channelToSessionMap.keySet().iterator();
+		return sessionToChannelMap.values().iterator();
 	}
 	
 }

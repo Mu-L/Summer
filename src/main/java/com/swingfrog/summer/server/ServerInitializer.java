@@ -44,7 +44,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 			pipeline.addLast(new HttpServerCodec());
 			pipeline.addLast(new HttpObjectAggregator(config.getMsgLength()));
 			pipeline.addLast(new ChunkedWriteHandler());
-			pipeline.addLast(new WebSocketUriFilter("/" + config.getServerName()));
+			pipeline.addLast(new WebSocketUriFilter(serverContext));
 			pipeline.addLast(new WebSocketServerProtocolHandler("/" + config.getServerName()));
 			pipeline.addLast(new WebSocketDecoder());
 			pipeline.addLast(new WebSocketEncoder());
